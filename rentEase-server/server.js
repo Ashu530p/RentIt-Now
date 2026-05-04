@@ -5,21 +5,28 @@ const Razorpay = require('razorpay');
 require('dotenv').config();
 
 const app = express();
-const PORT = 5000;
+
+// --- 🌐 DYNAMIC PORT ---
+// Render apna port khud provide karta hai, isliye process.env.PORT zaroori hai
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// --- 💳 RAZORPAY CONFIGURATION (Using your keys) ---
+// --- 💳 RAZORPAY CONFIGURATION ---
+// Inhe bhi aap .env mein daal sakte hain safety ke liye
 const razorpay = new Razorpay({
-    key_id: 'rzp_test_SkynQQhj3gRoHa', 
-    key_secret: 'vc7x83N96WHjbGSwyOxgRA5Y', 
+    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_SkynQQhj3gRoHa', 
+    key_secret: process.env.RAZORPAY_KEY_SECRET || 'vc7x83N96WHjbGSwyOxgRA5Y', 
 });
 
 // --- 🌿 MONGODB CONNECTION ---
-mongoose.connect('mongodb://localhost:27017/RentEase')
-    .then(() => console.log("✅ MongoDB Connected: RentEase Database"))
+// Render par MONGODB_URI use hoga, local par purana localhost link
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/RentEase';
+
+mongoose.connect(mongoURI)
+    .then(() => console.log("✅ MongoDB Connected Successfully"))
     .catch(err => console.log("❌ MongoDB Connection Error:", err));
 
 // --- 📝 DATABASE SCHEMAS ---
@@ -35,7 +42,7 @@ const productSchema = new mongoose.Schema({
 });
 const Product = mongoose.model('Product', productSchema);
 
-// 2. Booking/Order Schema (Updated for Payment Tracking)
+// 2. Booking/Order Schema
 const bookingSchema = new mongoose.Schema({
     razorpay_order_id: String,
     razorpay_payment_id: String,
@@ -67,7 +74,7 @@ app.post('/api/create-order', async (req, res) => {
     try {
         const { amount } = req.body;
         const options = {
-            amount: amount * 100, // Razorpay amount paise mein leta hai
+            amount: amount * 100, 
             currency: "INR",
             receipt: `receipt_${Date.now()}`,
         };
@@ -148,5 +155,5 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-    console.log(`🚀 RentEase Backend Running at http://localhost:${PORT}`);
+    console.log(`🚀 RentEase Backend Running on port ${PORT}`);
 });
