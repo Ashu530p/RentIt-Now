@@ -7,7 +7,7 @@ const MonitorOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/orders');
+      const res = await axios.get('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/orders');
       setOrders(res.data);
       setLoading(false);
     } catch (err) {

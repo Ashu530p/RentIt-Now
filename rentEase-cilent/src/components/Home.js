@@ -17,7 +17,7 @@ const Home = ({ addToCart }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/products');
+        const res = await axios.get('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/products');
         setProducts(res.data.length > 0 ? res.data : fallbackData);
       } catch (err) {
         setProducts(fallbackData);

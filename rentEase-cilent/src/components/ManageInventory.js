@@ -56,7 +56,7 @@ const ManageInventory = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/products', {
+      await axios.post('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/products', {
         ...product,
         price: Number(product.price),
         securityDeposit: Number(product.securityDeposit)

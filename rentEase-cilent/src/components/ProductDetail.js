@@ -17,7 +17,7 @@ const ProductDetail = ({ addToCart }) => {
     const fetchProduct = async () => {
       try {
         // Step 1: Try Backend
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(`https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/products/${id}`);
         setProduct(res.data);
       } catch (err) {
         console.error("Backend Error, checking local data...");
