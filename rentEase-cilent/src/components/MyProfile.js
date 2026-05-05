@@ -14,7 +14,7 @@ const MyProfile = () => {
     pincode: '452001',
     address: 'Indore, Madhya Pradesh',
     memberSince: 'Jan 2026',
-    kycProgress: 100 // Visual indicator logic
+    KYCProgress: 100 // Visual indicator logic
   });
 
   const handleSave = (e) => {
@@ -56,9 +56,9 @@ const MyProfile = () => {
           <div style={styles.progressSection}>
              <div style={styles.progressHeader}>
                 <span>Profile Completion</span>
-                <span>{profile.kycProgress}%</span>
+                <span>{profile.KYCProgress}%</span>
              </div>
-             <div style={styles.progressBar}><div style={{...styles.progressFill, width: `${profile.kycProgress}%`}}></div></div>
+             <div style={styles.progressBar}><div style={{...styles.progressFill, width: `${profile.KYCProgress}%`}}></div></div>
           </div>
         </div>
 

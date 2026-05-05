@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     role: { type: String, default: 'user' },
-    kycVerified: { type: Boolean, default: false }
+    KYCVerified: { type: Boolean, default: false }
 });
 const User = mongoose.model('User', userSchema);
 
@@ -143,7 +143,7 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email, password });
     if (user) {
-        res.json({ success: true, name: user.name, role: user.role, kyc: user.kycVerified });
+        res.json({ success: true, name: user.name, role: user.role, KYC: user.KYCVerified });
     } else {
         res.status(401).json({ message: "Galat Email ya Password" });
     }
