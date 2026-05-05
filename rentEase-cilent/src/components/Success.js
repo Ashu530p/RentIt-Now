@@ -1,194 +1,168 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaBoxOpen, FaArrowRight, FaShoppingBag } from 'react-icons/fa';
-import confetti from 'canvas-confetti'; // Optional: confetti install karein 'npm install canvas-confetti'
+import { FaCheckCircle, FaBoxOpen, FaArrowRight, FaShoppingBag, FaHeadset, FaFileAlt } from 'react-icons/fa';
+import confetti from 'canvas-confetti';
 
 const Success = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  // 🎉 Confetti effect jab page load ho
   useEffect(() => {
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#007bff', '#10b981', '#ff00d4']
-    });
+    // 🎉 Premium Confetti Burst
+    const duration = 3 * 1000;
+    const end = Date.now() + duration;
+
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#007bff', '#10b981']
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#00d4ff', '#1e293b']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+
     window.scrollTo(0, 0);
   }, []);
 
   if (!state) {
     return (
       <div style={styles.errorContainer}>
-        <h2>No Order Details Found!</h2>
-        <button onClick={() => navigate('/')} style={styles.shopBtn}>Back to Home</button>
+        <div style={styles.errorCard}>
+           <h2>Something went wrong!</h2>
+           <p>We couldn't retrieve your order details.</p>
+           <button onClick={() => navigate('/')} style={styles.shopBtn}>Back to Home</button>
+        </div>
       </div>
     );
   }
 
   return (
     <div style={styles.container}>
-      <div style={styles.successCard}>
+      <div style={styles.successCard} className="fade-in-up">
         
-        {/* Animated Check Icon */}
         <div style={styles.iconContainer}>
-          <FaCheckCircle size={80} color="#10b981" />
+          <FaCheckCircle size={70} color="#10b981" />
         </div>
 
-        <h1 style={styles.title}>Booking Confirmed!</h1>
-        <p style={styles.subtitle}>
-          Thank you for choosing <strong>RentEase</strong>. Your rental request for <strong>{state.name}</strong> has been successfully received.
-        </p>
+        <h1 style={styles.title}>Great Choice, {state.fullName?.split(' ')[0]}!</h1>
+        <p style={styles.subtitle}>Your rental for <strong>{state.productName}</strong> is confirmed. You've just upgraded your lifestyle!</p>
 
-        {/* Order Details Table */}
+        {/* 🕒 VISUAL TRACKER (Better than RentoMojo) */}
+        <div style={styles.timelineContainer}>
+            <div style={styles.timeStep}>
+                <div style={styles.stepCircleActive}><FaCheckCircle /></div>
+                <span style={styles.stepLabelActive}>Booked</span>
+            </div>
+            <div style={styles.stepLine}></div>
+            <div style={styles.timeStep}>
+                <div style={styles.stepCircle}><FaFileAlt /></div>
+                <span style={styles.stepLabel}>KYC</span>
+            </div>
+            <div style={styles.stepLine}></div>
+            <div style={styles.timeStep}>
+                <div style={styles.stepCircle}><FaTruckLoadingIcon /></div>
+                <span style={styles.stepLabel}>Delivery</span>
+            </div>
+        </div>
+
+        {/* Order Info Card */}
         <div style={styles.detailsBox}>
           <div style={styles.detailRow}>
-            <span style={styles.label}>Order ID:</span>
-            <span style={styles.value}>#{state.id}</span>
+            <span>Order Reference</span>
+            <strong>#{state.razorpay_payment_id?.slice(-8).toUpperCase()}</strong>
           </div>
           <div style={styles.detailRow}>
-            <span style={styles.label}>Amount Paid:</span>
-            <span style={{...styles.value, color: '#10b981', fontSize: '20px'}}>₹{state.price}</span>
+            <span>Amount Paid</span>
+            <strong style={{color:'#10b981'}}>₹{state.finalAmount}</strong>
           </div>
           <div style={styles.detailRow}>
-            <span style={styles.label}>Expected Delivery:</span>
-            <span style={styles.value}>Within 48 Hours</span>
+             <span>Delivery To</span>
+             <strong style={styles.addressText}>{state.address?.slice(0, 30)}...</strong>
           </div>
         </div>
 
-        {/* Info Box */}
         <div style={styles.infoNote}>
-          <FaBoxOpen size={20} style={{marginRight: '10px'}}/>
-          <span>Our team will contact you shortly to coordinate the setup at your address.</span>
+          <FaBoxOpen size={24} style={{marginRight: '15px'}}/>
+          <div>
+            <h4 style={{margin:0, fontSize:'14px'}}>Next Step: Document Verification</h4>
+            <p style={{margin:0, opacity:0.8}}>Keep your ID proof ready. Our team will call you within 24 hours.</p>
+          </div>
         </div>
 
         {/* Action Buttons */}
         <div style={styles.btnGroup}>
-          <button 
-            onClick={() => navigate('/order-history')} 
-            style={styles.primaryBtn}
-          >
-            View My Rentals <FaArrowRight style={{marginLeft: '10px'}}/>
+          <button onClick={() => navigate('/order-history')} style={styles.primaryBtn} className="hover-scale">
+            Track My Order <FaArrowRight style={{marginLeft: '10px'}}/>
           </button>
-          <button 
-            onClick={() => navigate('/')} 
-            style={styles.secondaryBtn}
-          >
-            <FaShoppingBag style={{marginRight: '10px'}}/> Continue Shopping
-          </button>
+          
+          <div style={styles.secondaryActions}>
+            <button onClick={() => navigate('/')} style={styles.textBtn}>
+              <FaShoppingBag /> Continue Shopping
+            </button>
+            <button onClick={() => navigate('/support')} style={styles.textBtn}>
+              <FaHeadset /> Need Help?
+            </button>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        .fade-in-up { animation: fadeInUp 0.6s ease-out; }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .hover-scale:hover { transform: scale(1.02); background: #000 !important; }
+      `}</style>
     </div>
   );
 };
 
+// Placeholder icon for delivery
+const FaTruckLoadingIcon = () => <i className="fa fa-truck" style={{fontSize:'14px'}}></i>;
+
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: '#f8fafc',
-    padding: '20px',
-    fontFamily: '"Segoe UI", Roboto, sans-serif'
-  },
-  successCard: {
-    background: '#fff',
-    maxWidth: '550px',
-    width: '100%',
-    padding: '50px 40px',
-    borderRadius: '30px',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.05)',
-    textAlign: 'center',
-    border: '1px solid #f1f5f9'
-  },
-  iconContainer: {
-    marginBottom: '25px',
-    animation: 'scaleIn 0.5s ease-out'
-  },
-  title: {
-    fontSize: '32px',
-    fontWeight: '900',
-    color: '#1e293b',
-    margin: '0 0 10px 0'
-  },
-  subtitle: {
-    fontSize: '15px',
-    color: '#64748b',
-    lineHeight: '1.6',
-    marginBottom: '35px'
-  },
-  detailsBox: {
-    background: '#fcfcfc',
-    border: '1px solid #f1f5f9',
-    borderRadius: '20px',
-    padding: '25px',
-    marginBottom: '30px'
-  },
-  detailRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '12px 0',
-    borderBottom: '1px dashed #e2e8f0'
-  },
-  label: {
-    color: '#94a3b8',
-    fontWeight: '600',
-    fontSize: '14px'
-  },
-  value: {
-    color: '#1e293b',
-    fontWeight: '800',
-    fontSize: '16px'
-  },
-  infoNote: {
-    display: 'flex',
-    alignItems: 'center',
-    background: '#f0f9ff',
-    color: '#0369a1',
-    padding: '15px 20px',
-    borderRadius: '12px',
-    fontSize: '13px',
-    textAlign: 'left',
-    marginBottom: '35px',
-    lineHeight: '1.4'
-  },
-  btnGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  primaryBtn: {
-    background: '#1e293b',
-    color: '#fff',
-    border: 'none',
-    padding: '18px',
-    borderRadius: '16px',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: '0.3s'
-  },
-  secondaryBtn: {
-    background: 'none',
-    color: '#64748b',
-    border: '1px solid #e2e8f0',
-    padding: '15px',
-    borderRadius: '16px',
-    fontWeight: '600',
-    fontSize: '14px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: '0.3s'
-  },
-  errorContainer: { textAlign: 'center', padding: '100px' },
-  shopBtn: { padding: '12px 25px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer' }
+  container: { minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f4f7fa', padding: '20px' },
+  successCard: { background: '#fff', maxWidth: '500px', width: '100%', padding: '40px', borderRadius: '32px', boxShadow: '0 30px 60px rgba(0,0,0,0.08)', textAlign: 'center' },
+  iconContainer: { marginBottom: '20px' },
+  title: { fontSize: '28px', fontWeight: '800', color: '#1e293b', margin: '0 0 10px' },
+  subtitle: { fontSize: '15px', color: '#64748b', lineHeight: '1.5', marginBottom: '30px' },
+  
+  // Timeline Styles
+  timelineContainer: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px', padding: '0 10px' },
+  timeStep: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', position:'relative' },
+  stepCircleActive: { width: '35px', height: '35px', background: '#10b981', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' },
+  stepCircle: { width: '35px', height: '35px', background: '#f1f5f9', color: '#94a3b8', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' },
+  stepLabelActive: { fontSize: '11px', fontWeight: '800', color: '#10b981', textTransform: 'uppercase' },
+  stepLabel: { fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' },
+  stepLine: { flex: 1, height: '2px', background: '#f1f5f9', margin: '0 10px', marginTop: '-18px' },
+
+  detailsBox: { background: '#f8fafc', borderRadius: '20px', padding: '20px', marginBottom: '30px', border: '1px solid #f1f5f9' },
+  detailRow: { display: 'flex', justifyContent: 'space-between', padding: '10px 0', fontSize: '14px', borderBottom: '1px solid #edf2f7' },
+  addressText: { maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+
+  infoNote: { display: 'flex', alignItems: 'center', background: '#007bff', color: '#fff', padding: '20px', borderRadius: '16px', textAlign: 'left', marginBottom: '30px' },
+  
+  btnGroup: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  primaryBtn: { background: '#1e293b', color: '#fff', border: 'none', padding: '18px', borderRadius: '16px', fontWeight: '800', fontSize: '16px', cursor: 'pointer', transition: '0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  secondaryActions: { display: 'flex', justifyContent: 'space-between' },
+  textBtn: { background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' },
+
+  errorContainer: { height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' },
+  errorCard: { textAlign: 'center', background: '#fff', padding: '40px', borderRadius: '24px' },
+  shopBtn: { padding: '12px 25px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight:'bold' }
 };
 
 export default Success;

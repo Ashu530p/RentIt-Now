@@ -1,17 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './index.css'; // Premium Global Styles
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <React.StrictMode>
+    {/* Humne App.js ko render kiya hai jo hamare saare routes aur logic ko handle kar raha hai */}
     <App />
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+/**
+ * 💡 RentEase Performance Logic:
+ * Agar tum chaho toh console.log ki jagah kisi analytics endpoint 
+ * (jaise Google Analytics) par metrics bhej sakte ho.
+ */
+reportWebVitals(console.log);

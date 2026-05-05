@@ -1,53 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaLock, FaShieldAlt, FaTimes, FaCreditCard } from 'react-icons/fa';
+import { FaLock, FaShieldAlt, FaTimes, FaCreditCard, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 
 const Payment = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // Error handling agar state missing ho
+  useEffect(() => {
+    // Agar direct access kiya jaye bina data ke
+    if (!state) {
+      setTimeout(() => navigate('/'), 3000);
+    }
+  }, [state, navigate]);
+
   if (!state) {
     return (
       <div style={styles.errorContainer}>
-        <h2>Order data missing! ⚠️</h2>
-        <button onClick={() => navigate('/')} style={styles.backBtn}>Back to Home</button>
+        <div style={styles.errorCard}>
+          <FaInfoCircle size={50} color="#f59e0b" />
+          <h2>Session Expired</h2>
+          <p>Order details not found. Redirecting to home...</p>
+          <button onClick={() => navigate('/')} style={styles.backBtn}>Go Home Now</button>
+        </div>
       </div>
     );
   }
 
   const finalAmount = state.summary?.total || state.finalAmount;
   const productName = state.product?.name || "Rental Item";
+  const deposit = state.summary?.deposit || 0;
 
-  // --- 💳 RAZORPAY INTEGRATION ---
+  // --- 💳 RAZORPAY INTEGRATION LOGIC ---
   const handlePayment = async () => {
     if (!window.Razorpay) {
-      alert("Razorpay SDK not found. Please check index.html script tag.");
+      alert("Payment Gateway loading... Please wait a moment.");
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Backend se Order ID mangwayein
       const res = await axios.post('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/create-order', {
         amount: finalAmount
       });
 
       const orderData = res.data;
 
-      // 2. Razorpay Modal Options
       const options = {
-        key: "rzp_test_SkynQQhj3gRoHa", // ✅ Your Test Key
+        key: "rzp_test_SkynQQhj3gRoHa", 
         amount: orderData.amount,
         currency: "INR",
-        name: "RentEase India",
-        description: `Booking for ${productName}`,
+        name: "RentEase",
+        description: `Rental Booking: ${productName}`,
         order_id: orderData.id,
-        // Modal ke andar wala logo (CDN link)
-        image: "https://cdn.razorpay.com/static/assets/logo/payment_method/razorpay.png",
+        image: "https://cdn-icons-png.flaticon.com/512/11520/11520448.png", // Custom Brand Icon
         handler: async function (response) {
           const paymentDetails = {
             razorpay_order_id: response.razorpay_order_id,
@@ -66,21 +74,27 @@ const Payment = () => {
             await axios.post('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/bookings', paymentDetails);
             const history = JSON.parse(localStorage.getItem('myOrders')) || [];
             localStorage.setItem('myOrders', JSON.stringify([
-              { id: response.razorpay_payment_id, name: productName, price: finalAmount, date: new Date().toLocaleDateString(), status: 'Successful' },
+              { 
+                id: response.razorpay_payment_id, 
+                name: productName, 
+                price: finalAmount, 
+                date: new Date().toLocaleDateString(), 
+                status: 'Successful',
+                img: state.product?.image
+              },
               ...history
             ]));
 
-            navigate('/success', { state: { ...paymentDetails, id: response.razorpay_payment_id, price: finalAmount, name: productName } });
+            navigate('/success', { state: paymentDetails });
           } catch (dbError) {
-            console.error("Database save failed:", dbError);
-            navigate('/success', { state: { ...paymentDetails, price: finalAmount } });
+            navigate('/success', { state: paymentDetails });
           }
         },
         prefill: {
-          name: state.shipping?.fullName || "Customer",
-          contact: state.shipping?.phone || "9999999999",
+          name: state.shipping?.fullName || "",
+          contact: state.shipping?.phone || "",
         },
-        theme: { color: "#1e293b" },
+        theme: { color: "#007bff" },
         modal: { ondismiss: function () { setLoading(false); } }
       };
 
@@ -88,63 +102,107 @@ const Payment = () => {
       rzp.open();
 
     } catch (err) {
-      console.error("Payment Error:", err);
-      alert("Error: Kya Backend server (5000) chal raha hai?");
       setLoading(false);
+      alert("Payment initiation failed. Please try again.");
     }
   };
 
   return (
     <div style={styles.background}>
       <div style={styles.payCard}>
+        {/* Step Indicator */}
+        <div style={styles.steps}>
+            <span style={styles.stepDone}><FaCheckCircle /> Delivery</span>
+            <div style={styles.lineActive}></div>
+            <span style={styles.stepActive}>Payment</span>
+        </div>
+
         <button style={styles.closeBtn} onClick={() => navigate(-1)}><FaTimes /></button>
         
         <div style={styles.header}>
-            {/* Image ki jagah Styled Text taaki break na ho */}
-            <div style={styles.logoText}>
-               <span style={{color: '#3399cc'}}>Razor</span>pay
-            </div>
-            <div style={styles.badge}><FaLock /> SECURE CHECKOUT</div>
+            <div style={styles.brandTitle}>Rent<span style={{color:'#007bff'}}>Ease</span> Secure</div>
+            <div style={styles.badge}><FaLock /> Encrypted</div>
         </div>
 
-        <div style={styles.infoBox}>
-            <p style={{margin:0, color:'#64748b', fontSize:'13px'}}>Total Amount Payable</p>
-            <h2 style={{fontSize:'32px', margin:'10px 0', color: '#1e293b'}}>₹{finalAmount}</h2>
-            <div style={styles.itemTag}>
-              <FaCreditCard size={12} /> {productName}
+        <div style={styles.summaryCard}>
+            <p style={styles.summaryLabel}>Final Amount to Pay</p>
+            <h1 style={styles.amountText}>₹{finalAmount.toLocaleString('en-IN')}</h1>
+            
+            <div style={styles.divider}></div>
+            
+            <div style={styles.detailRow}>
+                <span>{productName}</span>
+                <span>₹{finalAmount - deposit}</span>
+            </div>
+            <div style={styles.detailRow}>
+                <span>Refundable Deposit</span>
+                <span>₹{deposit}</span>
             </div>
         </div>
 
         <button 
           onClick={handlePayment} 
-          style={{...styles.payBtn, background: loading ? '#94a3b8' : '#1e293b'}}
+          style={{...styles.payBtn, opacity: loading ? 0.7 : 1}}
           disabled={loading}
+          className="pay-now-btn"
         >
-          {loading ? "Processing..." : `Confirm & Pay ₹${finalAmount}`}
+          {loading ? (
+            <><i className="fa fa-spinner fa-spin"></i> Processing...</>
+          ) : (
+            `Pay Securely ₹${finalAmount}`
+          )}
         </button>
 
         <div style={styles.footer}>
-            <FaShieldAlt color="#10b981" />
-            <span>Secure 256-bit SSL Encryption • PCI-DSS</span>
+            <div style={styles.trustIcons}>
+                <FaShieldAlt size={14} color="#10b981" /> 
+                <span>PCI-DSS Compliant • 256-bit SSL</span>
+            </div>
+            <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg" 
+                alt="Razorpay" 
+                style={styles.razorpayLogo} 
+            />
         </div>
       </div>
+
+      <style>{`
+        .pay-now-btn:hover { background: #0056b3 !important; transform: translateY(-2px); }
+        .pay-now-btn:active { transform: translateY(0); }
+      `}</style>
     </div>
   );
 };
 
 const styles = {
-  background: { height: '100vh', background: '#f1f5f9', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', fontFamily: 'sans-serif' },
-  payCard: { background: '#fff', padding: '40px', borderRadius: '28px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', width: '100%', maxWidth: '420px', textAlign: 'center', position:'relative' },
-  closeBtn: { position: 'absolute', top: '25px', right: '25px', background: 'none', border: 'none', cursor: 'pointer', color:'#94a3b8', fontSize: '18px' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '35px', borderBottom: '1px solid #f1f5f9', paddingBottom: '20px' },
-  logoText: { fontSize: '20px', fontWeight: '800', color: '#1e293b', letterSpacing: '-0.5px' },
-  badge: { fontSize: '11px', color: '#10b981', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px', textTransform: 'uppercase' },
-  infoBox: { marginBottom: '35px', padding: '25px', background: '#f8fafc', borderRadius: '20px', border: '1px solid #f1f5f9' },
-  itemTag: { display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#fff', padding: '6px 15px', borderRadius: '10px', fontSize: '12px', color: '#64748b', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' },
-  payBtn: { width: '100%', padding: '18px', color: '#fff', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' },
-  footer: { marginTop: '25px', fontSize: '10px', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: '600' },
-  errorContainer: { textAlign: 'center', padding: '100px' },
-  backBtn: { padding: '12px 25px', background: '#1e293b', color: '#fff', borderRadius: '10px', border: 'none', cursor: 'pointer' }
+  background: { height: '100vh', background: '#f4f7fa', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' },
+  payCard: { background: '#fff', padding: '40px', borderRadius: '32px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)', width: '100%', maxWidth: '440px', position:'relative' },
+  
+  steps: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '30px' },
+  stepDone: { fontSize: '12px', color: '#10b981', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' },
+  stepActive: { fontSize: '12px', color: '#007bff', fontWeight: 'bold' },
+  lineActive: { width: '40px', height: '2px', background: '#10b981' },
+
+  closeBtn: { position: 'absolute', top: '30px', right: '30px', background: 'none', border: 'none', cursor: 'pointer', color:'#cbd5e1', fontSize: '20px' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' },
+  brandTitle: { fontSize: '18px', fontWeight: '800', color: '#1e293b' },
+  badge: { fontSize: '10px', color: '#10b981', background: '#ecfdf5', padding: '4px 10px', borderRadius: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' },
+  
+  summaryCard: { background: '#f8fafc', padding: '25px', borderRadius: '24px', border: '1px solid #f1f5f9', marginBottom: '30px' },
+  summaryLabel: { margin: 0, color: '#64748b', fontSize: '13px', fontWeight: '600', textAlign: 'center' },
+  amountText: { fontSize: '36px', margin: '10px 0 20px', color: '#0f172a', textAlign: 'center', fontWeight: '900' },
+  divider: { height: '1px', background: '#e2e8f0', margin: '0 0 15px' },
+  detailRow: { display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '13px', color: '#475569', fontWeight: '500' },
+  
+  payBtn: { width: '100%', padding: '20px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '18px', fontSize: '16px', fontWeight: '800', cursor: 'pointer', transition: '0.3s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' },
+  
+  footer: { marginTop: '30px', textAlign: 'center' },
+  trustIcons: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '11px', color: '#94a3b8', fontWeight: '600', marginBottom: '15px' },
+  razorpayLogo: { height: '20px', opacity: 0.6 },
+  
+  errorContainer: { height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' },
+  errorCard: { textAlign: 'center', background: '#fff', padding: '50px', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' },
+  backBtn: { marginTop: '20px', padding: '12px 30px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }
 };
 
 export default Payment;

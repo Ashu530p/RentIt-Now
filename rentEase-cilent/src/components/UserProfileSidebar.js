@@ -1,55 +1,84 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const UserProfileSidebar = ({ isOpen, onClose, userName, onLogout }) => {
   const navigate = useNavigate();
+  const [animate, setAnimate] = useState(false);
 
-  // Agar sidebar open nahi hai toh kuch mat dikhao
+  // Logic: Sidebar slide-in animation trigger
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => setAnimate(true), 10);
+    } else {
+      setAnimate(false);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.sidebar} onClick={(e) => e.stopPropagation()}>
-        {/* Close Button */}
-        <button onClick={onClose} style={styles.closeBtn}>&times;</button>
+  const handleNav = (path) => {
+    setAnimate(false);
+    setTimeout(() => {
+      navigate(path);
+      onClose();
+    }, 300); // Wait for slide-out animation
+  };
 
-        {/* Profile Header */}
+  return (
+    <div style={{...styles.overlay, opacity: animate ? 1 : 0}} onClick={onClose}>
+      <div 
+        style={{
+          ...styles.sidebar, 
+          transform: animate ? 'translateX(0)' : 'translateX(100%)'
+        }} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header Section */}
         <div style={styles.header}>
-          <div style={styles.avatarLarge}>{userName ? userName[0].toUpperCase() : 'A'}</div>
-          <h2 style={styles.title}>Hi, {userName}!</h2>
-          <p style={styles.subtitle}>Welcome to RentEase</p>
+          <button onClick={onClose} style={styles.closeBtn}>
+            <i className="fa fa-times"></i>
+          </button>
+          <div style={styles.avatarLarge}>
+            {userName ? userName[0].toUpperCase() : 'A'}
+          </div>
+          <h2 style={styles.title}>{userName || 'Guest User'}</h2>
+          <div style={styles.verifiedBadge}>
+            <i className="fa fa-check-circle"></i> Verified Profile
+          </div>
         </div>
 
-        {/* Vertical Menu Buttons */}
+        {/* Menu Items Logic */}
         <div style={styles.menuContainer}>
-          {/* 🆕 Yeh button ab seedha naye page par le jayega */}
-          <button 
-            style={styles.menuBtn} 
-            onClick={() => { 
-              navigate('/profile'); 
-              onClose(); 
-            }}
-          >
-            <span style={styles.icon}>👤</span> Personal Information
+          <p style={styles.sectionLabel}>MY ACCOUNT</p>
+          
+          <button style={styles.menuBtn} onClick={() => handleNav('/profile')}>
+            <i className="fa fa-user" style={styles.icon}></i> Personal Information
           </button>
           
-          <button 
-            style={styles.menuBtn} 
-            onClick={() => { 
-              navigate('/orders'); 
-              onClose(); 
-            }}
-          >
-            <span style={styles.icon}>📦</span> Order History
+          <button style={styles.menuBtn} onClick={() => handleNav('/orders')}>
+            <i className="fa fa-box-open" style={styles.icon}></i> My Rentals / Orders
+          </button>
+
+          <button style={styles.menuBtn} onClick={() => handleNav('/credits')}>
+            <i className="fa fa-wallet" style={styles.icon}></i> RentEase Credits
+          </button>
+
+          <div style={styles.divider}></div>
+          <p style={styles.sectionLabel}>SUPPORT & LEGAL</p>
+
+          <button style={styles.menuBtn} onClick={() => handleNav('/support')}>
+            <i className="fa fa-headset" style={styles.icon}></i> Help & Support
           </button>
 
           <button style={styles.logoutBtn} onClick={onLogout}>
-            <span style={styles.icon}>🚪</span> Logout
+            <i className="fa fa-sign-out-alt" style={styles.icon}></i> Logout
           </button>
         </div>
 
+        {/* Footer */}
         <div style={styles.footer}>
-          <p style={styles.footerText}>RentEase v1.0</p>
+          <p style={styles.footerText}>RentEase – Everything on Rent.</p>
+          <span style={styles.version}>v2.0.4 Premium</span>
         </div>
       </div>
     </div>
@@ -58,82 +87,51 @@ const UserProfileSidebar = ({ isOpen, onClose, userName, onLogout }) => {
 
 const styles = {
   overlay: { 
-    position: 'fixed', 
-    top: 0, 
-    left: 0, 
-    width: '100%', 
-    height: '100%', 
-    background: 'rgba(0,0,0,0.6)', 
-    zIndex: 2000, 
-    display: 'flex', 
-    justifyContent: 'flex-end' 
+    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+    background: 'rgba(0,0,0,0.4)', zIndex: 9999, transition: '0.3s ease-in-out',
+    backdropFilter: 'blur(4px)'
   },
   sidebar: { 
-    width: '350px', 
-    height: '100%', 
-    background: '#fff', 
-    padding: '40px 25px', 
-    boxShadow: '-5px 0 15px rgba(0,0,0,0.2)', 
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column'
+    position: 'absolute', right: 0, width: '320px', height: '100%', 
+    background: '#fff', boxShadow: '-10px 0 30px rgba(0,0,0,0.1)', 
+    transition: '0.4s cubic-bezier(0.4, 0, 0.2, 1)', display: 'flex', flexDirection: 'column'
+  },
+  header: { 
+    padding: '40px 25px', background: '#f8fafc', textAlign: 'center', 
+    borderBottom: '1px solid #f1f5f9', position: 'relative' 
   },
   closeBtn: { 
-    position: 'absolute', 
-    top: '20px', 
-    right: '20px', 
-    fontSize: '30px', 
-    border: 'none', 
-    background: 'none', 
-    cursor: 'pointer', 
-    color: '#888' 
+    position: 'absolute', top: '20px', left: '20px', background: 'none', 
+    border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b' 
   },
-  header: { textAlign: 'center', marginBottom: '40px' },
   avatarLarge: { 
-    width: '90px', 
-    height: '90px', 
-    background: 'linear-gradient(135deg, #007bff, #00d4ff)', 
-    color: '#fff', 
-    borderRadius: '50%', 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    fontSize: '36px', 
-    fontWeight: 'bold', 
-    margin: '0 auto 15px', 
-    boxShadow: '0 4px 10px rgba(0,123,255,0.3)' 
+    width: '70px', height: '70px', background: '#007bff', color: '#fff', 
+    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+    fontSize: '28px', fontWeight: 'bold', margin: '0 auto 15px', 
+    boxShadow: '0 8px 16px rgba(0,123,255,0.2)' 
   },
-  title: { fontSize: '22px', margin: '0', color: '#1e293b', fontWeight: '800' },
-  subtitle: { fontSize: '14px', color: '#64748b', marginTop: '5px' },
-  menuContainer: { display: 'flex', flexDirection: 'column', gap: '15px' },
+  title: { fontSize: '20px', margin: 0, color: '#1e293b', fontWeight: '700' },
+  verifiedBadge: { fontSize: '11px', color: '#10b981', marginTop: '5px', fontWeight: '600' },
+  
+  menuContainer: { padding: '25px', flex: 1 },
+  sectionLabel: { fontSize: '11px', fontWeight: '700', color: '#94a3b8', letterSpacing: '1px', marginBottom: '15px' },
   menuBtn: { 
-    padding: '16px', 
-    textAlign: 'left', 
-    background: '#f8fafc', 
-    border: '1px solid #f1f5f9', 
-    borderRadius: '12px', 
-    cursor: 'pointer', 
-    fontSize: '15px', 
-    fontWeight: '600', 
-    color: '#475569',
-    transition: '0.3s',
-    display: 'flex',
-    alignItems: 'center'
+    width: '100%', padding: '14px 0', textAlign: 'left', background: 'none', 
+    border: 'none', cursor: 'pointer', fontSize: '15px', fontWeight: '600', 
+    color: '#475569', display: 'flex', alignItems: 'center', transition: '0.2s'
   },
-  icon: { marginRight: '12px' },
+  icon: { width: '25px', marginRight: '15px', color: '#64748b', fontSize: '16px' },
+  divider: { height: '1px', background: '#f1f5f9', margin: '20px 0' },
+  
   logoutBtn: { 
-    padding: '16px', 
-    textAlign: 'left', 
-    background: 'none', 
-    border: 'none', 
-    color: '#ef4444', 
-    cursor: 'pointer', 
-    fontSize: '15px', 
-    fontWeight: 'bold',
-    marginTop: '10px'
+    width: '100%', padding: '14px 0', textAlign: 'left', background: 'none', 
+    border: 'none', cursor: 'pointer', fontSize: '15px', fontWeight: '700', 
+    color: '#ef4444', display: 'flex', alignItems: 'center' 
   },
-  footer: { marginTop: 'auto', textAlign: 'center' },
-  footerText: { fontSize: '12px', color: '#cbd5e1' }
+  
+  footer: { padding: '25px', borderTop: '1px solid #f1f5f9', textAlign: 'center' },
+  footerText: { fontSize: '13px', fontWeight: '600', color: '#1e293b', margin: 0 },
+  version: { fontSize: '10px', color: '#94a3b8' }
 };
 
 export default UserProfileSidebar;

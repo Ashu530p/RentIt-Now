@@ -11,16 +11,19 @@ import ProductDetail from './components/ProductDetail';
 import Cart from './components/Cart';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import FAQ from './components/FAQ'; // 🆕 New Component
 
-// --- Protected User Components (User specific) ---
+// --- Protected User Components ---
 import CheckoutForm from './components/CheckoutForm';
 import Payment from './components/Payment';
 import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import MyProfile from './components/MyProfile'; 
 import ReportIssue from './components/ReportIssue';
+import KYC from './components/KYC'; // 🆕 New Component
+import ReferAndEarn from './components/ReferAndEarn'; // 🆕 New Component
 
-// --- Admin Components (Management) ---
+// --- Admin Components ---
 import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './components/AdminDashboard';
 import ManageInventory from './components/ManageInventory';
@@ -38,10 +41,10 @@ function App() {
   // --- Auth Logic ---
   const handleLoginSuccess = (userData) => {
     localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userRole', userData.role);
+    localStorage.setItem('userRole', userData.role || 'user');
     localStorage.setItem('userName', userData.name);
     setIsLoggedIn(true);
-    setUserRole(userData.role);
+    setUserRole(userData.role || 'user');
     setUserName(userData.name);
   };
 
@@ -71,9 +74,8 @@ function App() {
 
   return (
     <Router>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Inter', sans-serif", backgroundColor: '#f8fafc' }}>
         
-        {/* 🟢 NAVIGATION: Passing props to handle UI changes based on login */}
         <Navbar 
           cartCount={cart.length} 
           isLoggedIn={isLoggedIn} 
@@ -82,7 +84,6 @@ function App() {
           onLogout={handleLogout} 
         />
         
-        {/* 🟡 MAIN CONTENT: flex: 1 ensure karta hai ki footer humesha bottom mein rahe */}
         <main style={{ flex: 1 }}>
           <Routes>
             {/* --- 🌍 PUBLIC ROUTES --- */}
@@ -91,16 +92,19 @@ function App() {
             <Route path="/cart" element={<Cart cartItems={cart} removeFromCart={removeFromCart} />} />
             <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/faq" element={<FAQ />} />
             
-            {/* --- 👤 PROTECTED USER ROUTES (Login Required) --- */}
+            {/* --- 👤 PROTECTED USER ROUTES --- */}
             <Route path="/checkout" element={isLoggedIn ? <CheckoutForm cartItems={cart} /> : <Navigate to="/login" />} />
             <Route path="/payment" element={isLoggedIn ? <Payment /> : <Navigate to="/login" />} />
             <Route path="/success" element={isLoggedIn ? <Success /> : <Navigate to="/login" />} />
             <Route path="/orders" element={isLoggedIn ? <OrderHistory /> : <Navigate to="/login" />} />
             <Route path="/profile" element={isLoggedIn ? <MyProfile /> : <Navigate to="/login" />} />
             <Route path="/report-issue" element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} />
+            <Route path="/kyc" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
+            <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
-            {/* --- 🔐 ADMIN SECTION (Role Protection) --- */}
+            {/* --- 🔐 ADMIN SECTION --- */}
             <Route 
               path="/admin" 
               element={(isLoggedIn && userRole === 'admin') ? <AdminLayout /> : <Navigate to="/login" />}
@@ -113,12 +117,10 @@ function App() {
               <Route path="maintenance" element={<AdminMaintenance />} /> 
             </Route>
 
-            {/* 404 Redirect */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
 
-        {/* 🔴 FOOTER: Persistent across all pages */}
         <Footer />
       </div>
     </Router>

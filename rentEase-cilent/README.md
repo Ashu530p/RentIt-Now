@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+# 🛋️ RentEase – Premium Furniture & Appliance Rental Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**RentEase** ek full-stack modern rental marketplace hai jo users ko mehange furniture aur appliances bina khareede, saste monthly rent par lene ki suvidha deta hai. Ye project RentoMojo aur Furlenco jaise bade startups se inspired hai.
 
-## Available Scripts
+🚀 **Live Demo:** [RentEase Live](https://rent-ease-premium-furniture-applian.vercel.app/)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## ✨ Key Features (Upgraded)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 👤 User Side
+- **Smart Tenure Selector:** Jitne zyada mahine ka rent, utna bada discount.
+- **KYC Verification:** Identity verification ke liye dedicated flow (Aadhar/PAN upload).
+- **Refer & Earn:** Doston ko invite karein aur rental credits kamaein.
+- **Live Order Tracking:** Order place hone se lekar delivery tak ka professional timeline tracker.
+- **Support System:** Maintenance requests aur professional FAQ section.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🔐 Admin Side (Command Center)
+- **Live Revenue Tracker:** Real-time earnings aur monthly growth metrics.
+- **Inventory Management:** Naye items add karein, images upload karein aur condition (New/Mint) set karein.
+- **Live Preview:** Admin panel par hi dekh sakte hain ki product website par kaisa dikhega.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Tech Stack
 
-### `npm run build`
+- **Frontend:** React.js, React-Icons, Recharts (for analytics), Axios.
+- **Backend:** Node.js, Express.js.
+- **Database:** MongoDB (Atlas).
+- **Styling:** Custom CSS (Modern Glassmorphism & Minimalist UI).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📂 Project Structure (Client)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```text
+client/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── AdminDashboard.js   # Live Revenue & Analytics
+│   │   ├── ProductDetail.js    # Tenure Logic & Pricing
+│   │   ├── KYC.js              # Identity Verification
+│   │   ├── OrderHistory.js     # Tracking Timeline
+│   │   └── ...
+│   ├── App.js                  # Protected Routes & Logic
+│   ├── index.css               # Global Theme & Typography
+│   └── ...
+└── README.md
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+👨‍💻 Developed By
+Aashish Parmar
+Self-taught Web Developer & Digital Creator
+📍 Bhopal, Madhya Pradesh

@@ -1,60 +1,88 @@
-import React, { useState } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import UserProfileSidebar from './UserProfileSidebar'; // Ensure ye file aapne banayi hai
+import React, { useState, useEffect } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import UserProfileSidebar from './UserProfileSidebar';
+import { FaMapMarkerAlt, FaSearch, FaShoppingCart, FaChevronDown, FaCrown } from 'react-icons/fa';
 
 const Navbar = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("Bhopal"); // Default to your base
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    
+    // City sync from LocalStorage
+    const city = localStorage.getItem('rentEaseLocation');
+    if (city) setSelectedCity(city);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
-      <nav style={styles.nav}>
-        {/* Left Side: Logo */}
-        <div style={styles.logoSection}>
+      <nav style={{
+        ...styles.nav,
+        backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.95)' : '#ffffff',
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        height: scrolled ? '70px' : '85px',
+        boxShadow: scrolled ? '0 10px 30px rgba(0,0,0,0.05)' : 'none'
+      }}>
+        
+        {/* 1. Logo & City Picker (RentoMojo Style) */}
+        <div style={styles.leftSection}>
           <Link to="/" style={styles.logoLink}>
             <span style={styles.logoAccent}>Rent</span>Ease
           </Link>
-        </div>
-
-        {/* Center: Navigation Links */}
-        <div style={styles.navLinks}>
-          <NavLink 
-            to="/" 
-            style={({ isActive }) => isActive ? {...styles.link, ...styles.activeLink} : styles.link}
-          >
-            Furniture
-          </NavLink>
-          <NavLink 
-            to="/appliances" 
-            style={({ isActive }) => isActive ? {...styles.link, ...styles.activeLink} : styles.link}
-          >
-            Appliances
-          </NavLink>
           
-          {/* Admin Badge: Only for Admins */}
-          {isLoggedIn && userRole === 'admin' && (
-            <Link to="/admin" style={styles.adminLink}>
-              Admin Panel 🛠️
-            </Link>
-          )}
+          <div style={styles.locationBox} onClick={() => {
+            const newCity = prompt("Enter City (Indore / Bhopal):", selectedCity);
+            if(newCity) {
+              localStorage.setItem('rentEaseLocation', newCity);
+              setSelectedCity(newCity);
+            }
+          }}>
+            <FaMapMarkerAlt style={styles.locIcon} />
+            <span style={styles.locText}>{selectedCity}</span>
+            <FaChevronDown style={styles.locArrow} />
+          </div>
         </div>
 
-        {/* Right Side: Actions */}
+        {/* 2. Smart Search (Centralized) */}
+        <div style={styles.searchSection}>
+          <div style={styles.searchBar}>
+            <FaSearch style={styles.searchIcon} />
+            <input 
+              type="text" 
+              placeholder="Search furniture, AC, beds..." 
+              style={styles.searchInput}
+            />
+          </div>
+        </div>
+
+        {/* 3. Actions & User Profile */}
         <div style={styles.rightSection}>
-          {/* Cart Icon with Dynamic Badge */}
+          <div style={styles.navLinks}>
+            <NavLink to="/faq" style={styles.link}>Offers</NavLink>
+            {/* Admin Quick Link if logged in as admin */}
+            {isLoggedIn && userRole === 'admin' && (
+              <Link to="/admin" style={styles.adminBadge}>
+                <FaCrown /> Admin
+              </Link>
+            )}
+          </div>
+
           <Link to="/cart" style={styles.cartContainer}>
-            <span style={styles.cartIcon}>🛒</span>
-            <span style={styles.badge}>{cartCount}</span>
+            <FaShoppingCart style={styles.cartIcon} />
+            {cartCount > 0 && <span style={styles.badge}>{cartCount}</span>}
           </Link>
 
-          {/* User UI Logic */}
           {isLoggedIn ? (
-            <div 
-              style={styles.userProfile} 
-              onClick={() => setSidebarOpen(true)}
-              title="Open Profile Menu"
-            >
+            <div style={styles.userProfile} onClick={() => setSidebarOpen(true)}>
               <div style={styles.userInfo}>
-                <span style={styles.userName}>Hi, {userName || 'User'}</span>
+                <span style={styles.userName}>Hi, {userName?.split(' ')[0]}</span>
+                <span style={styles.userSub}>My Account</span>
               </div>
               <div style={styles.avatar}>
                 {userName ? userName[0].toUpperCase() : 'U'}
@@ -62,116 +90,62 @@ const Navbar = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
             </div>
           ) : (
             <div style={styles.authGroup}>
-              <Link to="/login" style={styles.loginBtn}>Login</Link>
-              <Link to="/signup" style={styles.signupBtn}>Sign Up</Link>
+              <Link to="/login" style={styles.loginBtn}>Login / Signup</Link>
             </div>
           )}
         </div>
       </nav>
 
-      {/* Sidebar Trigger - Ensure is file me Order History/Profile links hon */}
       {isSidebarOpen && (
         <UserProfileSidebar 
           isOpen={isSidebarOpen} 
           onClose={() => setSidebarOpen(false)} 
           userName={userName} 
+          userRole={userRole}
           onLogout={onLogout} 
         />
       )}
+
+      {/* Animation for Navbar */}
+      <style>{`
+        nav { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+      `}</style>
     </>
   );
 };
 
 const styles = {
-  nav: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '0 6%',
-    height: '75px',
-    backgroundColor: '#ffffff',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-    position: 'sticky',
-    top: 0,
-    zIndex: 1000,
-  },
-  logoSection: { display: 'flex', alignItems: 'center' },
-  logoLink: { 
-    fontSize: '24px', 
-    fontWeight: '800', 
-    color: '#1a1a1a', 
-    textDecoration: 'none',
-    letterSpacing: '-0.5px'
-  },
+  nav: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 5%', position: 'sticky', top: 0, zIndex: 1000, borderBottom: '1px solid #f1f5f9' },
+  leftSection: { display: 'flex', alignItems: 'center', gap: '25px' },
+  logoLink: { fontSize: '26px', fontWeight: '900', color: '#1e293b', textDecoration: 'none', letterSpacing: '-1px' },
   logoAccent: { color: '#007bff' },
-  navLinks: { display: 'flex', gap: '30px', alignItems: 'center' },
-  link: { 
-    color: '#444', 
-    textDecoration: 'none', 
-    fontSize: '15px', 
-    fontWeight: '500',
-    transition: '0.3s hover',
-  },
-  activeLink: { color: '#007bff', fontWeight: '700' },
-  adminLink: { 
-    color: '#d97706', 
-    textDecoration: 'none', 
-    fontWeight: '600', 
-    fontSize: '13px',
-    background: '#fef3c7',
-    padding: '6px 14px',
-    borderRadius: '20px',
-  },
+  
+  locationBox: { display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '8px 14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' },
+  locIcon: { color: '#007bff', fontSize: '14px' },
+  locText: { fontSize: '13px', fontWeight: '700', color: '#475569' },
+  locArrow: { fontSize: '10px', color: '#94a3b8' },
+
+  searchSection: { flex: 1, margin: '0 50px', maxWidth: '450px' },
+  searchBar: { position: 'relative', display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '14px', padding: '0 18px', border: '1px solid transparent', transition: '0.3s' },
+  searchIcon: { color: '#94a3b8', fontSize: '14px' },
+  searchInput: { width: '100%', border: 'none', background: 'transparent', padding: '12px', outline: 'none', fontSize: '14px', color: '#1e293b' },
+
   rightSection: { display: 'flex', alignItems: 'center', gap: '25px' },
-  cartContainer: { position: 'relative', textDecoration: 'none', display: 'flex', alignItems: 'center' },
-  cartIcon: { fontSize: '22px' },
-  badge: { 
-    position: 'absolute', 
-    top: '-8px', 
-    right: '-10px', 
-    background: '#ff4d4d', // 🔴 Red for attention
-    color: '#fff', 
-    fontSize: '10px', 
-    padding: '2px 6px', 
-    borderRadius: '50%',
-    fontWeight: 'bold',
-    border: '2px solid #fff'
-  },
-  userProfile: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: '12px', 
-    cursor: 'pointer',
-    padding: '5px 5px 5px 15px',
-    borderRadius: '30px',
-    backgroundColor: '#f8f9fa',
-    border: '1px solid #e9ecef',
-    transition: '0.3s'
-  },
-  userName: { fontSize: '14px', fontWeight: '600', color: '#333' },
-  avatar: { 
-    width: '35px', 
-    height: '35px', 
-    background: 'linear-gradient(135deg, #007bff, #00d4ff)', 
-    borderRadius: '50%', 
-    color: '#fff', 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    fontWeight: 'bold',
-    boxShadow: '0 2px 8px rgba(0,123,255,0.3)'
-  },
-  authGroup: { display: 'flex', gap: '10px' },
-  loginBtn: { color: '#007bff', textDecoration: 'none', fontWeight: '600', fontSize: '14px', padding: '10px 15px' },
-  signupBtn: { 
-    background: '#007bff', 
-    color: '#fff', 
-    padding: '10px 22px', 
-    borderRadius: '12px', 
-    textDecoration: 'none', 
-    fontWeight: '600', 
-    fontSize: '14px' 
-  }
+  navLinks: { display: 'flex', alignItems: 'center', gap: '20px' },
+  link: { color: '#64748b', textDecoration: 'none', fontSize: '14px', fontWeight: '700', transition: '0.2s' },
+  adminBadge: { background: '#fff7ed', color: '#c2410c', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '800', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid #ffedd5' },
+
+  cartContainer: { position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' },
+  cartIcon: { fontSize: '22px', color: '#1e293b' },
+  badge: { position: 'absolute', top: '-10px', right: '-10px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: '900', width: '18px', height: '18px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #fff' },
+
+  userProfile: { display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '5px', borderRadius: '12px', transition: '0.2s' },
+  userInfo: { display: 'flex', flexDirection: 'column', textAlign: 'right' },
+  userName: { fontSize: '14px', fontWeight: '800', color: '#1e293b', lineHeight: '1.2' },
+  userSub: { fontSize: '10px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' },
+  avatar: { width: '38px', height: '38px', background: 'linear-gradient(135deg, #007bff, #00d4ff)', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', boxShadow: '0 4px 12px rgba(0,123,255,0.2)' },
+  
+  loginBtn: { background: '#1e293b', color: '#fff', padding: '12px 24px', borderRadius: '14px', textDecoration: 'none', fontSize: '14px', fontWeight: '800', transition: '0.3s' }
 };
 
 export default Navbar;
