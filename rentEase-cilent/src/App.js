@@ -21,7 +21,7 @@ import Payment from './components/Payment';
 import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import ReportIssue from './components/ReportIssue';
-import KYC from './components/kyc';
+import KYC from './components/KYC'; // FIXED: Path match with KYC.js
 import ReferAndEarn from './components/ReferAndEarn';
 import LiveRevenueTracker from './components/LiveRevenueTracker';
 
@@ -105,8 +105,10 @@ function App() {
             <Route path="/orders" element={isLoggedIn ? <OrderHistory /> : <Navigate to="/login" />} />
             <Route path="/profile" element={isLoggedIn ? <MyProfile /> : <Navigate to="/login" />} />
             <Route path="/report-issue" element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} />
-            {/* FIX: KYC ko KYCUpload se replace kiya gaya hai jo upar import hai */}
-            <Route path="/KYC" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
+            
+            {/* Component and Path now consistent */}
+            <Route path="/kycupload" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
+            
             <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
             {/* --- ADMIN SECTION --- */}
