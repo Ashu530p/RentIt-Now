@@ -14,7 +14,7 @@ const SetPricing = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products');
+      const res = await axios.get('http://https://rentease-premium-furniture-appliances-at-aynp.onrender.com/api/products');
       setProducts(res.data);
     } catch (err) { console.error(err); }
   };
@@ -33,7 +33,7 @@ const SetPricing = () => {
 
   const handleSaveEdit = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${id}`, {
+      await axios.put(`http://https://rentease-premium-furniture-appliances-at-aynp.onrender.com/api/products/${id}`, {
         price: Number(editData.price),
         securityDeposit: Number(editData.securityDeposit)
       });
@@ -45,7 +45,7 @@ const SetPricing = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${deleteId}`);
+      await axios.delete(`http://https://rentease-premium-furniture-appliances-at-aynp.onrender.com/api/products/${deleteId}`);
       showToast("Removed from store! 🗑️");
       setShowModal(false);
       fetchProducts();

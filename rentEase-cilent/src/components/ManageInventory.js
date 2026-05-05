@@ -57,7 +57,7 @@ const ManageInventory = () => {
 
     try {
       // Logic: Sending data to your Render backend
-      await axios.post('http://localhost:5000/api/products', {
+      await axios.post('http://https://rentease-premium-furniture-appliances-at-aynp.onrender.com/api/products', {
         ...product,
         price: Number(product.price),
         securityDeposit: Number(product.securityDeposit)
