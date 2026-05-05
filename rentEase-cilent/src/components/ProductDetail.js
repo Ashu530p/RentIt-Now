@@ -61,7 +61,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/products/${id}`);
+        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
         setProduct(res.data);
         setRentalConfig({ months: 3, currentPrice: res.data.price });
       } catch (err) {

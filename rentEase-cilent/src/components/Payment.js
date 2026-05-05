@@ -42,7 +42,7 @@ const Payment = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/create-order', {
+      const res = await axios.post('http://localhost:5000/api/create-order', {
         amount: finalAmount
       });
 
@@ -71,7 +71,7 @@ const Payment = () => {
           };
 
           try {
-            await axios.post('https://rentease-premium-furniture-appliances-at-4idp.onrender.com/api/bookings', paymentDetails);
+            await axios.post('http://localhost:5000/api/bookings', paymentDetails);
             const history = JSON.parse(localStorage.getItem('myOrders')) || [];
             localStorage.setItem('myOrders', JSON.stringify([
               { 
