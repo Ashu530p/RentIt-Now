@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCloudUploadAlt, FaShieldAlt, FaIdCard, FaArrowLeft, FaCheckCircle } from 'react-icons/fa';
+import { FaShieldAlt, FaIdCard, FaArrowLeft } from 'react-icons/fa';
 
-const KYC = () => {
+// Component name updated to 'Kyc' to match filename Kyc.js
+const Kyc = () => {
   const navigate = useNavigate();
   const [files, setFiles] = useState({ front: null, back: null });
   const [loading, setLoading] = useState(false);
@@ -40,16 +41,16 @@ const KYC = () => {
         <form onSubmit={handleSubmit}>
           <div style={styles.uploadGrid}>
             <div style={styles.uploadBox}>
-              <label style={styles.label}>Aadhar Front</label>
+              <label style={styles.label}>Aadhaar Front</label>
               <div style={styles.dropZone}>
-                {files.front ? <img src={files.front} style={styles.preview} /> : <FaIdCard size={30} color="#cbd5e1" />}
+                {files.front ? <img src={files.front} style={styles.preview} alt="Front Preview" /> : <FaIdCard size={30} color="#cbd5e1" />}
                 <input type="file" onChange={(e) => handleFile(e, 'front')} style={styles.hiddenInput} />
               </div>
             </div>
             <div style={styles.uploadBox}>
-              <label style={styles.label}>Aadhar Back</label>
+              <label style={styles.label}>Aadhaar Back</label>
               <div style={styles.dropZone}>
-                {files.back ? <img src={files.back} style={styles.preview} /> : <FaIdCard size={30} color="#cbd5e1" />}
+                {files.back ? <img src={files.back} style={styles.preview} alt="Back Preview" /> : <FaIdCard size={30} color="#cbd5e1" />}
                 <input type="file" onChange={(e) => handleFile(e, 'back')} style={styles.hiddenInput} />
               </div>
             </div>
@@ -78,4 +79,4 @@ const styles = {
   submitBtn: { width: '100%', padding: '18px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '16px', fontWeight: '800', cursor: 'pointer' }
 };
 
-export default KYC;
+export default Kyc;

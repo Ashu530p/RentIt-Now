@@ -21,7 +21,7 @@ import Payment from './components/Payment';
 import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import ReportIssue from './components/ReportIssue';
-import KYC from './components/KYC'; // FIXED: Path match with KYC.js
+import Kyc from './components/Kyc'; // 'KYC' ki jagah 'Kyc'
 import ReferAndEarn from './components/ReferAndEarn';
 import LiveRevenueTracker from './components/LiveRevenueTracker';
 
@@ -107,7 +107,7 @@ function App() {
             <Route path="/report-issue" element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} />
             
             {/* Component and Path now consistent */}
-            <Route path="/kycupload" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
+            <Route path="/kyc" element={isLoggedIn ? <Kyc /> : <Navigate to="/login" />} />
             
             <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
