@@ -106,7 +106,7 @@ function App() {
             <Route path="/profile" element={isLoggedIn ? <MyProfile /> : <Navigate to="/login" />} />
             <Route path="/report-issue" element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} />
             {/* FIX: KYC ko KYCUpload se replace kiya gaya hai jo upar import hai */}
-            <Route path="/KYC" element={isLoggedIn ? <KYC/> : <Navigate to="/login" />} />
+            <Route path="/KYC" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
             <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
             {/* --- ADMIN SECTION --- */}
