@@ -20,7 +20,6 @@ import CheckoutForm from './components/CheckoutForm';
 import Payment from './components/Payment';
 import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
-import MyProfile from './components/MyProfile'; 
 import ReportIssue from './components/ReportIssue';
 import KYCUpload from './components/KYC'; // Fixed: Name matched with file and usage
 import ReferAndEarn from './components/ReferAndEarn';
