@@ -21,7 +21,7 @@ import Payment from './components/Payment';
 import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import ReportIssue from './components/ReportIssue';
-import KYC from './components/KYC';
+import KYC from './components/kyc';
 import ReferAndEarn from './components/ReferAndEarn';
 import LiveRevenueTracker from './components/LiveRevenueTracker';
 
