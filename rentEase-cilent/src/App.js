@@ -20,7 +20,7 @@ import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import MyProfile from './components/MyProfile'; 
 import ReportIssue from './components/ReportIssue';
-import KYC from './components/KYC'; // 🆕 New Component
+import KYCUpload  from './components/KYC'; // 🆕 New Component
 import ReferAndEarn from './components/ReferAndEarn'; // 🆕 New Component
 
 // --- Admin Components ---
