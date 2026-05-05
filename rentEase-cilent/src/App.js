@@ -105,7 +105,7 @@ function App() {
             <Route path="/orders" element={isLoggedIn ? <OrderHistory /> : <Navigate to="/login" />} />
             <Route path="/profile" element={isLoggedIn ? <MyProfile /> : <Navigate to="/login" />} />
             <Route path="/report-issue" element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} />
-            <Route path="/kyc" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
+            <Route path="/kycupload" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
             <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
             {/* --- ADMIN SECTION --- */}
