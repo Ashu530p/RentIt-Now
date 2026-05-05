@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // --- Global UI Components ---
@@ -11,7 +11,9 @@ import ProductDetail from './components/ProductDetail';
 import Cart from './components/Cart';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import FAQ from './components/FAQ'; // 🆕 New Component
+import MyProfile from './components/MyProfile';
+import FAQ from './components/FAQ';
+import UserProfileSidebar from './components/UserProfileSidebar';
 
 // --- Protected User Components ---
 import CheckoutForm from './components/CheckoutForm';
@@ -20,8 +22,10 @@ import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import MyProfile from './components/MyProfile'; 
 import ReportIssue from './components/ReportIssue';
-import KYCUpload  from './components/KYC'; // 🆕 New Component
-import ReferAndEarn from './components/ReferAndEarn'; // 🆕 New Component
+import KYCUpload from './components/KYC'; // Fixed: Name matched with file and usage
+import ReferAndEarn from './components/ReferAndEarn';
+import LiveRevenueTracker from './components/LiveRevenueTracker';
+
 
 // --- Admin Components ---
 import AdminLayout from './components/AdminLayout';
@@ -30,6 +34,7 @@ import ManageInventory from './components/ManageInventory';
 import SetPricing from './components/SetPricing';
 import MonitorOrders from './components/MonitorOrders';
 import AdminMaintenance from './components/AdminMaintenance';
+import AdminSidebar from './components/AdminSidebar';
 
 function App() {
   // --- States Management ---
@@ -86,7 +91,7 @@ function App() {
         
         <main style={{ flex: 1 }}>
           <Routes>
-            {/* --- 🌍 PUBLIC ROUTES --- */}
+            {/* --- PUBLIC ROUTES --- */}
             <Route path="/" element={<Home addToCart={addToCart} />} />
             <Route path="/product/:id" element={<ProductDetail addToCart={addToCart} />} />
             <Route path="/cart" element={<Cart cartItems={cart} removeFromCart={removeFromCart} />} />
@@ -94,7 +99,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/faq" element={<FAQ />} />
             
-            {/* --- 👤 PROTECTED USER ROUTES --- */}
+            {/* --- PROTECTED USER ROUTES --- */}
             <Route path="/checkout" element={isLoggedIn ? <CheckoutForm cartItems={cart} /> : <Navigate to="/login" />} />
             <Route path="/payment" element={isLoggedIn ? <Payment /> : <Navigate to="/login" />} />
             <Route path="/success" element={isLoggedIn ? <Success /> : <Navigate to="/login" />} />
@@ -104,7 +109,7 @@ function App() {
             <Route path="/kyc" element={isLoggedIn ? <KYC /> : <Navigate to="/login" />} />
             <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
-            {/* --- 🔐 ADMIN SECTION --- */}
+            {/* --- ADMIN SECTION --- */}
             <Route 
               path="/admin" 
               element={(isLoggedIn && userRole === 'admin') ? <AdminLayout /> : <Navigate to="/login" />}
