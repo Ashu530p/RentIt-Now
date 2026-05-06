@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // --- Global UI Components ---
@@ -13,7 +13,6 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import MyProfile from './components/MyProfile';
 import FAQ from './components/FAQ';
-import UserProfileSidebar from './components/UserProfileSidebar';
 
 // --- Protected User Components ---
 import CheckoutForm from './components/CheckoutForm';
@@ -21,10 +20,8 @@ import Payment from './components/Payment';
 import Success from './components/Success';
 import OrderHistory from './components/OrderHistory';
 import ReportIssue from './components/ReportIssue';
-import Kyc from './components/Kyc'; // 'KYC' ki jagah 'Kyc'
+import Kyc from './components/Kyc'; 
 import ReferAndEarn from './components/ReferAndEarn';
-import LiveRevenueTracker from './components/LiveRevenueTracker';
-
 
 // --- Admin Components ---
 import AdminLayout from './components/AdminLayout';
@@ -33,14 +30,23 @@ import ManageInventory from './components/ManageInventory';
 import SetPricing from './components/SetPricing';
 import MonitorOrders from './components/MonitorOrders';
 import AdminMaintenance from './components/AdminMaintenance';
-import AdminSidebar from './components/AdminSidebar';
 
 function App() {
   // --- States Management ---
-  const [cart, setCart] = useState([]);
+  // Cart ko localStorage se load kar rahe hain taaki refresh par data na jaye
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('rentEaseCart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
   const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || 'user');
   const [userName, setUserName] = useState(localStorage.getItem('userName') || '');
+
+  // Cart update hote hi localStorage mein save karo
+  useEffect(() => {
+    localStorage.setItem('rentEaseCart', JSON.stringify(cart));
+  }, [cart]);
 
   // --- Auth Logic ---
   const handleLoginSuccess = (userData) => {
@@ -57,17 +63,21 @@ function App() {
     setIsLoggedIn(false);
     setUserRole('user');
     setUserName('');
+    setCart([]); // Logout par cart khali
     window.location.href = '/login';
   };
 
-  // --- Cart Logic ---
+  // --- Cart Logic (Better handling for Tenure & Price) ---
   const addToCart = (product) => {
     const pId = product._id || product.id;
+    // Check if item with SAME tenure already exists
     const exists = cart.find((item) => (item._id || item.id) === pId);
+    
     if (exists) {
-      setCart(cart.map((item) => (item._id || item.id) === pId ? { ...exists, qty: exists.qty + 1 } : item));
+      alert("Item already in cart! Aap cart mein quantity change kar sakte hain.");
     } else {
       setCart([...cart, { ...product, qty: 1 }]);
+      // Notification ya alert de sakte ho yahan
     }
   };
 
@@ -78,7 +88,7 @@ function App() {
 
   return (
     <Router>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Inter', sans-serif", backgroundColor: '#f8fafc' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif", backgroundColor: '#ffffff' }}>
         
         <Navbar 
           cartCount={cart.length} 
@@ -105,10 +115,7 @@ function App() {
             <Route path="/orders" element={isLoggedIn ? <OrderHistory /> : <Navigate to="/login" />} />
             <Route path="/profile" element={isLoggedIn ? <MyProfile /> : <Navigate to="/login" />} />
             <Route path="/report-issue" element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} />
-            
-            {/* Component and Path now consistent */}
             <Route path="/kyc" element={isLoggedIn ? <Kyc /> : <Navigate to="/login" />} />
-            
             <Route path="/refer" element={isLoggedIn ? <ReferAndEarn /> : <Navigate to="/login" />} />
 
             {/* --- ADMIN SECTION --- */}
