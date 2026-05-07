@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 // --- Components ---
 // Yahan humne NavbarFix ko as 'Navbar' import kiya hai taaki niche ka code change na karna pade
-import NavbarFix from './components/NavbarFix'; 
+import Navbarfix from './components/Navbarfix'; 
 import Footer from './components/Footer';
 import Home from './components/Home';
 import ProductDetail from './components/ProductDetail';
