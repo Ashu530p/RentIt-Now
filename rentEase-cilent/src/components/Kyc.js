@@ -1,28 +1,51 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaShieldAlt, FaIdCard, FaArrowLeft } from 'react-icons/fa';
+import axios from 'axios';
+import { FaShieldAlt, FaIdCard, FaArrowLeft, FaCloudUploadAlt } from 'react-icons/fa';
 
-// Component name updated to 'Kyc' to match filename Kyc.js
 const Kyc = () => {
   const navigate = useNavigate();
   const [files, setFiles] = useState({ front: null, back: null });
+  const [previews, setPreviews] = useState({ front: null, back: null });
   const [loading, setLoading] = useState(false);
 
   const handleFile = (e, side) => {
     const file = e.target.files[0];
     if (file) {
-      setFiles({ ...files, [side]: URL.createObjectURL(file) });
+      // Preview ke liye URL banayein
+      setPreviews({ ...previews, [side]: URL.createObjectURL(file) });
+      
+      // File ko Base64 mein convert karein (Backend limit ke hisab se)
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        setFiles(prev => ({ ...prev, [side]: reader.result }));
+      };
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!files.front || !files.back) return alert("Please upload both sides.");
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      // Backend ko data bhejein
+      // Note: Aapke server.js mein KYC ke liye alag route add karna hoga
+      await axios.post('https://rentease-premium-furniture-appliances-at-aynp.onrender.com/api/auth/update-kyc', {
+        email: user.email,
+        kycDocs: files // Base64 strings
+      });
+
       alert("Documents submitted! Verification will take 4-6 hours. 🚀");
-      navigate('/orders');
-    }, 2000);
+      navigate('/');
+    } catch (err) {
+      alert("Submission failed. Please try smaller image sizes.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,28 +58,30 @@ const Kyc = () => {
         
         <div style={styles.alertBox}>
           <FaShieldAlt color="#10b981" />
-          <span>Your data is encrypted & stored securely as per RBI guidelines.</span>
+          <span>Your data is encrypted & stored securely as per guidelines.</span>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div style={styles.uploadGrid}>
-            <div style={styles.uploadBox}>
-              <label style={styles.label}>Aadhaar Front</label>
-              <div style={styles.dropZone}>
-                {files.front ? <img src={files.front} style={styles.preview} alt="Front Preview" /> : <FaIdCard size={30} color="#cbd5e1" />}
-                <input type="file" onChange={(e) => handleFile(e, 'front')} style={styles.hiddenInput} />
+            {['front', 'back'].map((side) => (
+              <div key={side} style={styles.uploadBox}>
+                <label style={styles.label}>ID {side.toUpperCase()}</label>
+                <div style={styles.dropZone}>
+                  {previews[side] ? (
+                    <img src={previews[side]} style={styles.preview} alt={`${side} Preview`} />
+                  ) : (
+                    <div style={{textAlign: 'center'}}>
+                      <FaCloudUploadAlt size={30} color="#cbd5e1" />
+                      <p style={{fontSize: '10px', color: '#94a3b8'}}>Click to upload</p>
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" onChange={(e) => handleFile(e, side)} style={styles.hiddenInput} />
+                </div>
               </div>
-            </div>
-            <div style={styles.uploadBox}>
-              <label style={styles.label}>Aadhaar Back</label>
-              <div style={styles.dropZone}>
-                {files.back ? <img src={files.back} style={styles.preview} alt="Back Preview" /> : <FaIdCard size={30} color="#cbd5e1" />}
-                <input type="file" onChange={(e) => handleFile(e, 'back')} style={styles.hiddenInput} />
-              </div>
-            </div>
+            ))}
           </div>
           <button type="submit" style={styles.submitBtn} disabled={loading}>
-            {loading ? "Uploading Documents..." : "Complete KYC"}
+            {loading ? "Verifying & Uploading..." : "Complete KYC"}
           </button>
         </form>
       </div>
@@ -64,19 +89,5 @@ const Kyc = () => {
   );
 };
 
-const styles = {
-  container: { minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f4f7fa', padding: '20px' },
-  card: { background: '#fff', padding: '40px', borderRadius: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', width: '100%', maxWidth: '550px' },
-  header: { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' },
-  backBtn: { background: '#f1f5f9', border: 'none', padding: '10px', borderRadius: '50%', cursor: 'pointer' },
-  title: { fontSize: '24px', fontWeight: '900', color: '#1e293b', margin: 0 },
-  alertBox: { background: '#ecfdf5', padding: '15px', borderRadius: '15px', color: '#065f46', fontSize: '12px', display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '30px' },
-  uploadGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' },
-  label: { fontSize: '11px', fontWeight: '800', color: '#64748b', marginBottom: '8px', display: 'block' },
-  dropZone: { height: '150px', background: '#f8fafc', border: '2px dashed #e2e8f0', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' },
-  hiddenInput: { position: 'absolute', width: '100%', height: '100%', opacity: 0, cursor: 'pointer' },
-  preview: { width: '100%', height: '100%', objectFit: 'cover' },
-  submitBtn: { width: '100%', padding: '18px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '16px', fontWeight: '800', cursor: 'pointer' }
-};
-
+// ... styles wahi rahenge ...
 export default Kyc;

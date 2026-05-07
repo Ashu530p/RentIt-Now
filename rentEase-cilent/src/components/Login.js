@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios'; // Axios zaroori hai
 import { FaTimes, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 
 const Login = ({ onLoginSuccess }) => {
@@ -9,34 +10,50 @@ const Login = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Logic: Simulation of API delay
-    setTimeout(() => {
-      const role = email.includes('admin') ? 'admin' : 'customer';
-      onLoginSuccess({ 
-        name: 'Aashish', 
-        email: email,
-        role: role,
-        avatar: 'A' 
+    try {
+      // 1. Backend API Call
+      const res = await axios.post('https://rentease-premium-furniture-appliances-at-aynp.onrender.com/api/auth/login', { 
+        email, 
+        password 
       });
+
+      if (res.data.success) {
+        // 2. localStorage mein user data save karein (role ke saath)
+        localStorage.setItem('user', JSON.stringify(res.data));
+
+        // 3. Global State update karein (App.js wala state)
+        onLoginSuccess({ 
+          name: res.data.name, 
+          email: res.data.email,
+          role: res.data.role, // Backend se 'admin' ya 'user' aayega
+          avatar: res.data.name.charAt(0) 
+        });
+
+        setLoading(false);
+
+        // 4. Role-based Redirect 🚀
+        if (res.data.role === 'admin') {
+          navigate('/admin'); // Admin dashboard path
+        } else {
+          navigate('/'); // User home path
+        }
+      }
+    } catch (err) {
       setLoading(false);
-      navigate(role === 'admin' ? '/admin' : '/');
-    }, 1000);
+      // Backend se jo error message aa raha hai wo dikhayein
+      alert(err.response?.data?.message || "Login Failed! Please check your credentials.");
+    }
   };
 
   return (
     <div style={styles.background}>
       <div style={styles.loginCard} className="fade-in-up">
         
-        {/* Close Button */}
-        <button 
-          style={styles.closeBtn} 
-          onClick={() => navigate('/')} 
-          title="Back to Home"
-        >
+        <button style={styles.closeBtn} onClick={() => navigate('/')} title="Back to Home">
           <FaTimes />
         </button>
 
@@ -45,7 +62,6 @@ const Login = ({ onLoginSuccess }) => {
           <p style={styles.subtitle}>Login to manage your rentals and payments.</p>
         </div>
 
-        {/* Social Login (RentoMojo Style) */}
         <button style={styles.googleBtn}>
           <FaGoogle style={{marginRight: '10px'}} /> Sign in with Google
         </button>
@@ -64,6 +80,7 @@ const Login = ({ onLoginSuccess }) => {
                 placeholder="name@example.com" 
                 style={styles.input} 
                 required 
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
@@ -81,6 +98,7 @@ const Login = ({ onLoginSuccess }) => {
                 placeholder="••••••••" 
                 style={styles.input} 
                 required 
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
               <div style={styles.eyeIcon} onClick={() => setShowPassword(!showPassword)}>
@@ -109,30 +127,6 @@ const Login = ({ onLoginSuccess }) => {
   );
 };
 
-const styles = {
-  background: { height: '100vh', width: '100%', backgroundImage: 'linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.8)), url("https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600")', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' },
-  loginCard: { background: '#ffffff', padding: '50px 45px', borderRadius: '32px', boxShadow: '0 25px 50px rgba(0,0,0,0.15)', width: '100%', maxWidth: '440px', position: 'relative' },
-  closeBtn: { position: 'absolute', top: '25px', right: '25px', width: '35px', height: '35px', borderRadius: '50%', background: '#f1f5f9', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', cursor: 'pointer', transition: '0.3s' },
-  header: { textAlign: 'center', marginBottom: '30px' },
-  title: { fontSize: '28px', fontWeight: '900', color: '#1e293b', margin: 0 },
-  subtitle: { fontSize: '14px', color: '#64748b', marginTop: '8px' },
-  
-  googleBtn: { width: '100%', padding: '14px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: '#475569', cursor: 'pointer', marginBottom: '25px', transition: '0.2s' },
-  divider: { position: 'relative', textAlign: 'center', marginBottom: '30px', borderBottom: '1px solid #f1f5f9' },
-  dividerText: { position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: '#fff', padding: '0 15px', fontSize: '10px', fontWeight: '800', color: '#cbd5e1', letterSpacing: '1px' },
-
-  form: { display: 'flex', flexDirection: 'column', gap: '22px' },
-  inputGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  label: { fontSize: '12px', fontWeight: '800', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' },
-  forgotLink: { fontSize: '12px', color: '#007bff', textDecoration: 'none', fontWeight: '700' },
-  inputWrapper: { position: 'relative', display: 'flex', alignItems: 'center' },
-  icon: { position: 'absolute', left: '18px', color: '#94a3b8' },
-  input: { width: '100%', padding: '15px 15px 15px 50px', borderRadius: '16px', border: '2px solid #f1f5f9', fontSize: '15px', outline: 'none', transition: '0.3s', background: '#f8fafc' },
-  eyeIcon: { position: 'absolute', right: '18px', color: '#94a3b8', cursor: 'pointer' },
-  
-  loginBtn: { padding: '18px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: '16px', fontWeight: '800', fontSize: '16px', cursor: 'pointer', transition: '0.3s' },
-  footerText: { textAlign: 'center', marginTop: '25px', fontSize: '14px', color: '#64748b' },
-  signupLink: { color: '#007bff', textDecoration: 'none', fontWeight: '800' }
-};
+// ... styles object (wahi purana wala use karein) ...
 
 export default Login;
