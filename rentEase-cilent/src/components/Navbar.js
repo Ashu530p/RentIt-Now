@@ -3,7 +3,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaSearch, FaShoppingCart, FaChevronDown, FaCrown, FaTimes } from 'react-icons/fa';
 
 // Component name updated to NavbarFix to match your request
-const Navbarfix = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
+const Navbar = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
@@ -158,4 +158,4 @@ const styles = {
 };
 
 // Name changed to match export
-export default Navbarfix;
+export default Navbar;
