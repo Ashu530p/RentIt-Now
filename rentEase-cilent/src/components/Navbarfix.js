@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { FaMapMarkerAlt, FaSearch, FaShoppingCart, FaChevronDown, FaCrown, FaTimes, FaSignOutAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaSearch, FaShoppingCart, FaChevronDown, FaCrown, FaTimes } from 'react-icons/fa';
 
-const Navbar = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
+// Component name updated to NavbarFix to match your request
+const NavbarFix = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Indore"); 
@@ -87,7 +87,7 @@ const Navbar = ({ cartCount, isLoggedIn, userName, userRole, onLogout }) => {
             <div style={styles.userProfile}>
               <div style={styles.userInfo}>
                 <span style={styles.userName}>{userName?.split(' ')[0]}</span>
-                <span style={styles.userSub} onClick={handleLogoutAction} style={{cursor:'pointer', color:'#ef4444', fontSize:'10px'}}>Logout?</span>
+                <span onClick={handleLogoutAction} style={{cursor:'pointer', color:'#ef4444', fontSize:'10px', fontWeight:'700'}}>Logout?</span>
               </div>
               <div style={styles.avatar}>{userName ? userName[0].toUpperCase() : 'U'}</div>
             </div>
@@ -148,7 +148,6 @@ const styles = {
   userProfile: { display: 'flex', alignItems: 'center', gap: '10px' },
   userInfo: { display: 'flex', flexDirection: 'column', textAlign: 'right' },
   userName: { fontSize: '13px', fontWeight: '700', color: '#1e293b' },
-  userSub: { fontSize: '10px' },
   avatar: { width: '35px', height: '35px', background: '#007bff', borderRadius: '8px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700' },
   loginBtn: { background: '#1e293b', color: '#fff', padding: '10px 20px', borderRadius: '10px', textDecoration: 'none', fontSize: '14px', fontWeight: '700' },
   modalOverlay: { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 },
@@ -158,5 +157,5 @@ const styles = {
   cityItem: { padding: '12px', textAlign: 'center', borderRadius: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }
 };
 
-// --- YEH SABSE ZAROORI LINE HAI ---
-export default Navbar;
+// Name changed to match export
+export default NavbarFix;

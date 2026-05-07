@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // --- Components ---
-import Navbar from './components/Navbar';
+// Yahan humne NavbarFix ko as 'Navbar' import kiya hai taaki niche ka code change na karna pade
+import NavbarFix from './components/NavbarFix'; 
 import Footer from './components/Footer';
 import Home from './components/Home';
 import ProductDetail from './components/ProductDetail';
@@ -75,7 +76,8 @@ function App() {
   return (
     <Router>
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#ffffff' }}>
-        {/* Is Navbar ke upar kuch nahi hona chahiye */}
+        
+        {/* Ye component ab seedha NavbarFix file se data uthayega */}
         <Navbar 
           cartCount={cart.length} 
           isLoggedIn={isLoggedIn} 
