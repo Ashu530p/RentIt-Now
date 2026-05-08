@@ -3,6 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaTruck, FaTools, FaUndo, FaStar, FaFilter } from 'react-icons/fa';
 
+// --- FIXED CATEGORIES DATA (Using Reliable Online Icons) ---
+const topCategories = [
+  { name: 'Packages', img: 'https://cdn-icons-png.flaticon.com/512/679/679922.png' },
+  { name: 'Furniture', img: 'https://cdn-icons-png.flaticon.com/512/2590/2590525.png' },
+  { name: 'Appliances', img: 'https://cdn-icons-png.flaticon.com/512/3659/3659929.png' },
+  { name: 'Electronics', img: 'https://cdn-icons-png.flaticon.com/512/2777/2777142.png' },
+  { name: 'Fitness', img: 'https://cdn-icons-png.flaticon.com/512/2964/2964514.png' }
+];
+
+const fallbackData = [
+  { id: "1", name: "Wooden Dining Table", category: "Furniture", price: 500, securityDeposit: 999, image: "https://images.unsplash.com/photo-1577140917170-285929fb55b7?w=500" }
+];
+
 const Home = ({ addToCart }) => {
   const navigate = useNavigate();
   const [category, setCategory] = useState('All');
@@ -64,18 +77,28 @@ const Home = ({ addToCart }) => {
         <div style={styles.trustItem}><FaUndo color="#007bff"/> <span>Cancel Anytime</span></div>
       </div>
 
-      {/* 🏢 CATEGORIES - UPDATED FOR PUBLIC FOLDER */}
+      {/* 🏢 CATEGORIES SECTION - Fixed Image Loading Logic */}
       <div id="categories" style={styles.sectionPadding}>
         <h2 style={styles.sectionTitle}>Browse our top categories</h2>
         <div style={styles.categoryGrid}>
           {topCategories.map((cat, index) => (
             <div key={index} style={styles.catItem} onClick={() => handleCategoryClick(cat.name)}>
-              <div style={{...styles.catIconBox, border: category === cat.name ? '2px solid #007bff' : 'none'}} className="cat-hover">
+              <div 
+                style={{
+                    ...styles.catIconBox, 
+                    border: category === cat.name ? '2px solid #007bff' : '1px solid #f1f5f9',
+                    background: category === cat.name ? '#e0f0ff' : '#ffffff'
+                }} 
+                className="cat-hover"
+              >
                 <img 
                   src={cat.img} 
                   alt={cat.name} 
                   style={styles.catImg} 
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Icon'; }}
+                  onError={(e) => { 
+                    e.target.style.display = 'none'; 
+                    e.target.parentNode.innerHTML = '<span style="font-size:24px">📦</span>';
+                  }}
                 />
               </div>
               <span style={styles.catName}>{cat.name}</span>
@@ -138,26 +161,13 @@ const Home = ({ addToCart }) => {
         }
         .imgContainer:hover .view-details-overlay { opacity: 1; }
         .cat-hover { cursor: pointer; transition: 0.3s; }
-        .cat-hover:hover { transform: scale(1.05); background: #e0f0ff !important; }
+        .cat-hover:hover { transform: scale(1.05); }
         .fade-in { animation: fadeIn 0.8s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
 };
-
-// --- UPDATED CATEGORIES DATA ---
-const topCategories = [
-  { name: 'Packages', img: '/images/Packages.png' },
-  { name: 'Furniture', img: '/images/Furniture.png' },
-  { name: 'Appliances', img: '/images/Appliances.png' },
-  { name: 'Electronics', img: '/images/Electronics.png' },
-  { name: 'Fitness', img: '/images/Fitness.png' }
-];
-
-const fallbackData = [
-  { id: "1", name: "Wooden Dining Table", category: "Furniture", price: 500, securityDeposit: 999, image: "https://images.unsplash.com/photo-1577140917170-285929fb55b7?w=500" }
-];
 
 const styles = {
   homeContainer: { background: '#fff', minHeight: '100vh' },
@@ -171,9 +181,9 @@ const styles = {
   sectionPadding: { padding: '60px 8% 20px' },
   sectionTitle: { fontSize: '28px', fontWeight: '800', marginBottom: '30px', color: '#1e293b' },
   categoryGrid: { display: 'flex', gap: '30px', overflowX: 'auto', paddingBottom: '10px', scrollbarWidth: 'none' },
-  catItem: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  catIconBox: { width: '85px', height: '85px', background: '#f1f5f9', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s' },
-  catImg: { width: '50px', height: '50px', objectFit: 'contain' },
+  catItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '100px' },
+  catIconBox: { width: '85px', height: '85px', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' },
+  catImg: { width: '45px', height: '45px', objectFit: 'contain' },
   catName: { fontSize: '13px', fontWeight: '700', textAlign: 'center', display: 'block', marginTop: '10px', color: '#475569' },
   exploreHeader: { padding: '40px 8% 0' },
   filterFlex: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
